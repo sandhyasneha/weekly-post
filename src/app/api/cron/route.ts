@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     const contextPast = recentPosts ? JSON.stringify(recentPosts) : "None";
 
     const completion = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-5-sonnet-latest",
       max_tokens: 300,
       system: "You are a professional social media manager agent. Write one micro-post for X that is short, compelling, and under 250 characters. Do not output anything else but the raw post text.",
       messages: [{ 
