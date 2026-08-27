@@ -1,1 +1,7 @@
-import { NextResponse } from "next/server";`n`nexport const dynamic = "force-dynamic";`n`nexport async function GET(request: Request) {`n  return NextResponse.json({ message: "Hello! The API path is working!" });`n}
+import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  return NextResponse.json({ message: "Hello! The API path is working!" });
+}
