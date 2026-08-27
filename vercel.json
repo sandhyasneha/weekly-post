@@ -1,1 +1,8 @@
-{`n  "crons": [`n    {`n      "path": "/api/cron",`n      "schedule": "0 9 * * 1"`n    }`n  ],`n  "rewrites": [`n    {`n      "source": "/api/cron",`n      "destination": "/api/cron/route"`n    }`n  ]`n}
+{
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 9 * * 1"
+    }
+  ]
+}
