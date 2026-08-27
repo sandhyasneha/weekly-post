@@ -3,6 +3,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
 import { TwitterApi } from 'twitter-api-v2';
 
+export const dynamic = 'force-dynamic';
+
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || '' });
 const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
 
@@ -51,9 +53,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, tweetId: tweetResponse.data.id, text: postContent });
 
   } catch (error: any) {
-    await supabase.from('posting_history').insert([
-      { platform: 'X', generated_text: 'FAILED TO GENERATE/POST', status: 'failed', error_message: error.message }
-    ]);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
