@@ -2,17 +2,19 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// FORCE DYNAMIC CONFIGURATION TO BYPASS PRERENDER ERRORS
 export const dynamic = 'force-dynamic';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function Dashboard() {
   const [drafts, setDrafts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+
+  // Initialize client dynamically at runtime to prevent prerender errors
+  const getSupabaseClient = () => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    return createClient(supabaseUrl, supabaseAnonKey);
+  };
 
   useEffect(() => {
     fetchDrafts();
@@ -21,6 +23,7 @@ export default function Dashboard() {
   const fetchDrafts = async () => {
     setLoading(true);
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('posting_history')
         .select('*')
