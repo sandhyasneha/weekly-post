@@ -52,7 +52,8 @@ export async function GET(request: Request) {
       messages: [{ role: "user", content: "Generate this week's unique product promo post draft with optimized keywords." }],
     });
 
-    const firstBlock = completion.content;
+    // Fix 1: Safely extract the first entry block element using bracket array indexing
+    const firstBlock = completion.content[0];
     const postContent = firstBlock && firstBlock.type === 'text' ? firstBlock.text.trim() : '';
     
     if (!postContent) throw new Error("Claude generated an empty post.");
@@ -66,9 +67,12 @@ export async function GET(request: Request) {
     ]).select();
 
     if (error) throw error;
+    
+    // Fix 2: Safety verify array payload collection records before reading row index keys
     if (!data || data.length === 0) throw new Error("Failed to insert draft into Supabase.");
+    const insertedRow = data[0];
 
-    return NextResponse.json({ success: true, status: 'draft_saved', id: data.id, text: postContent });
+    return NextResponse.json({ success: true, status: 'draft_saved', id: insertedRow.id, text: postContent });
 
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
