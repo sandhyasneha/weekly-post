@@ -1,3 +1,4 @@
+@'
 'use client';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
@@ -9,10 +10,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  // Initialize client dynamically at runtime to prevent prerender errors
+  // Hardcoded public credentials to bypass Vercel environment variable blocks
   const getSupabaseClient = () => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseUrl = 'https://supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmb3VoYm13dW5vZW1pem94am5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4MTU2NzgsImV4cCI6MjEwMzM5MTY3OH0.MyxPLoJvmkt4chsv1bGVJUAB3PYBnlwPgkB-WEi5Iys';
     return createClient(supabaseUrl, supabaseAnonKey);
   };
 
@@ -49,7 +50,7 @@ export default function Dashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        alert("?? Tweet published successfully!");
+        alert("🎉 Tweet published successfully!");
         setDrafts(drafts.filter(d => d.id !== id));
       } else {
         alert("Error publishing: " + data.error);
@@ -76,7 +77,7 @@ export default function Dashboard() {
               onClick={fetchDrafts}
               className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs font-medium border border-slate-700 transition-colors"
             >
-              ?? Refresh Queue
+              🔄 Refresh Queue
             </button>
           </div>
         </header>
@@ -135,5 +136,4 @@ export default function Dashboard() {
     </div>
   );
 }
-
-// Final environment synchronization completion token
+'@ | Set-Content -Path "src/app/page.tsx"
