@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
     const { data: recentPosts } = await supabase
       .from('posting_history')
-      .select('generated_text, target_product')
+      .select('generated_text')
       .order('created_at', { ascending: false })
       .limit(2);
 
@@ -46,20 +46,17 @@ export async function GET(request: Request) {
       messages: [{ role: "user", content: "Generate this week's unique product promo post draft." }],
     });
 
-    // Type-safe extraction using the first indexed array entry [0]
     const firstBlock = completion.content[0];
     const postContent = firstBlock && firstBlock.type === 'text' ? firstBlock.text.trim() : '';
     
     if (!postContent) throw new Error("Claude generated an empty post.");
 
-    const targetProduct = postContent.toLowerCase().includes('arch.nexplan.io') ? 'arch.nexplan.io' : 'nexplan.io';
-
+    // Removed 'target_product' to bypass the missing column error
     const { data, error } = await supabase.from('posting_history').insert([
       { 
         platform: 'X', 
         generated_text: postContent, 
-        status: 'pending_review', 
-        target_product: targetProduct 
+        status: 'pending_review'
       }
     ]).select();
 
