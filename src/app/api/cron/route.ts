@@ -46,12 +46,12 @@ export async function GET(request: Request) {
       messages: [{ role: "user", content: "Generate this week's unique product promo post draft." }],
     });
 
+    // Fix: Explicitly grab the first item index [0] out of the response array safely
     const firstBlock = completion.content[0];
     const postContent = firstBlock && firstBlock.type === 'text' ? firstBlock.text.trim() : '';
     
     if (!postContent) throw new Error("Claude generated an empty post.");
 
-    // Removed 'target_product' to bypass the missing column error
     const { data, error } = await supabase.from('posting_history').insert([
       { 
         platform: 'X', 
