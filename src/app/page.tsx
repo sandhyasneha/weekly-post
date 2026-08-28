@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,12 +8,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  const getSupabaseClient = () => {
-    const supabaseUrl = 'https://supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmb3VoYm13dW5vZW1pem94am5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4MTU2NzgsImV4cCI6MjEwMzM5MTY3OH0.MyxPLoJvmkt4chsv1bGVJUAB3PYBnlwPgkB-WEi5Iys';
-    return createClient(supabaseUrl, supabaseAnonKey);
-  };
-
   useEffect(() => {
     fetchDrafts();
   }, []);
@@ -22,15 +15,10 @@ export default function Dashboard() {
   const fetchDrafts = async () => {
     setLoading(true);
     try {
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from('posting_history')
-        .select('*')
-        .eq('status', 'pending_review')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setDrafts(data || []);
+      const res = await fetch('/api/drafts');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch backend logs");
+      setDrafts(data.drafts || []);
     } catch (err: any) {
       alert("Error fetching database drafts: " + err.message);
     } finally {
@@ -87,7 +75,7 @@ export default function Dashboard() {
           </h2>
 
           {loading ? (
-            <p className="text-slate-400 italic text-sm">Querying Supabase clusters...</p>
+            <p className="text-slate-400 italic text-sm">Querying internal proxy routes...</p>
           ) : drafts.length === 0 ? (
             <div className="text-center py-8 border border-dashed border-slate-700 rounded-lg">
               <p className="text-slate-400 text-sm">No pending drafts found. Your weekly automatic background generator is completely synchronized!</p>
