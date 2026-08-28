@@ -14,7 +14,6 @@ export async function GET(request: Request) {
       return new NextResponse('Unauthorized access', { status: 401 });
     }
 
-    // Fetch past generations to alternate cleanly between products
     const { data: recentPosts } = await supabase
       .from('posting_history')
       .select('generated_text, target_product')
@@ -47,13 +46,11 @@ export async function GET(request: Request) {
       messages: [{ role: "user", content: "Generate this week's unique product promo post draft." }],
     });
 
-    const postContent = completion.content[0].type === 'text' ? completion.content[0].text.trim() : '';
+    const postContent = completion.content.type === 'text' ? completion.content.text.trim() : '';
     if (!postContent) throw new Error("Claude generated an empty post.");
 
-    // Determine the product target for database indexing
     const targetProduct = postContent.toLowerCase().includes('arch.nexplan.io') ? 'arch.nexplan.io' : 'nexplan.io';
 
-    // SAVE AS PENDING REVIEW (Bypassing direct tweet execution)
     const { data, error } = await supabase.from('posting_history').insert([
       { 
         platform: 'X', 
@@ -62,6 +59,9 @@ export async function GET(request: Request) {
         target_product: targetProduct 
       }
     ]).select();
+
+    if (error) throw error;
+    if (!data || data.length === 0) throw new Error("Failed to insert draft into Supabase.");
 
     return NextResponse.json({ success: true, status: 'draft_saved', id: data[0].id, text: postContent });
 
