@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
+// FORCE DYNAMIC CONFIGURATION TO BYPASS PRERENDER ERRORS
+export const dynamic = 'force-dynamic';
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -25,8 +28,6 @@ export default function Dashboard() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
-      // FIX: Wired database rows straight into your application state controller
       setDrafts(data || []);
     } catch (err: any) {
       alert("Error fetching database drafts: " + err.message);
@@ -91,7 +92,6 @@ export default function Dashboard() {
             </div>
           ) : (
             drafts.map((draft) => {
-              // Parse out product type cleanly based on draft text content matches
               const textContent = draft.generated_text || '';
               const isArch = textContent.toLowerCase().includes('arch.nexplan');
               const displayLabel = isArch ? 'arch.nexplan.io' : 'nexplan.io';
