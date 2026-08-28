@@ -46,7 +46,10 @@ export async function GET(request: Request) {
       messages: [{ role: "user", content: "Generate this week's unique product promo post draft." }],
     });
 
-    const postContent = completion.content.type === 'text' ? completion.content.text.trim() : '';
+    // Type-safe extraction using the first indexed array entry [0]
+    const firstBlock = completion.content[0];
+    const postContent = firstBlock && firstBlock.type === 'text' ? firstBlock.text.trim() : '';
+    
     if (!postContent) throw new Error("Claude generated an empty post.");
 
     const targetProduct = postContent.toLowerCase().includes('arch.nexplan.io') ? 'arch.nexplan.io' : 'nexplan.io';
